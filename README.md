@@ -1,76 +1,56 @@
-# Software-Security-Robot
-Embassy Rust code for Security Robot (with ultrasonic, motors, and PIR motion detection)
+# Microprocessor architecture (MA/PM) Lab
 
-Security Robot - Rust Embassy Project
-A smart security robot built with Rust Embassy framework for Raspberry Pi Pico W, featuring obstacle avoidance, motion detection, and emotional LED display.
+![PMRust Lab logo](https://gitlab.cs.pub.ro/pmrust/pmrust.pages.upb.ro/-/raw/main/website/static/img/logo.svg?ref_type=heads)
 
-Features
-Obstacle Avoidance: Ultrasonic sensor detects obstacles and triggers avoidance maneuvers
-Motion Detection: PIR sensor detects human presence for security monitoring
-Emotional Display: 8x8 LED matrix shows happy/angry faces based on threat level
-Telegram Alerts: Sends security notifications via Telegram bot
-Smart Behavior: Friendly when safe, alert when motion detected near obstacles
+This repository contains the lab skeleton for the **MA/PM courses**.
 
-Hardware Requirements
+## Project structure
 
-Raspberry Pi Pico W
-HC-SR04 Ultrasonic Sensor (Trig: PIN_16, Echo: PIN_17)
-PIR Motion Sensor (PIN_22)
-MAX7219 LED Matrix (DIN: PIN_12, CLK: PIN_10, CS: PIN_11)
-Motor Driver (L298N, Pins 6-9)
-WiFi connection for Telegram integration
-2x Dc motors
+```txt
+.
+├── Cargo.toml
+├── README.md
+├── build.rs
+├── cyw43-firmware
+│   ├── 43439A0.bin
+│   ├── 43439A0_btfw.bin
+│   ├── 43439A0_clm.bin
+│   ├── LICENSE-permissive-binary-license-1.0.txt
+│   └── README.md
+├── embassy-lab-utils
+│   ├── Cargo.toml
+│   └── src
+│       ├── lib.rs
+│       └── wifi.rs
+├── memory.x
+├── rust-toolchain.toml
+└── src
+    ├── irqs.rs
+    └── main.rs
+```
 
-Pin Configuration
-Ultrasonic: PIN_16 (Trig), PIN_17 (Echo)
-PIR Sensor: PIN_22
-LED Matrix: PIN_12 (DIN), PIN_10 (CLK), PIN_11 (CS)
-Motors: PIN_6-9 (Motor driver inputs)
-Project Structure
-├── main.rs          # Main application logic
-├── ultrasonic.rs    # HC-SR04 sensor driver
-├── pir.rs           # PIR motion sensor
-├── matrix.rs        # MAX7219 LED matrix driver
-├── motor.rs         # Motor control
-└── telegram.rs      # Telegram bot integration
-Robot Behavior
-Normal Operation (No Motion)
+- `src` contains the source code for your lab.
+    - `main.rs` contains the source code for the application. By default, it blinks the Pico's LED.
+    - `irqs.rs` contains the definition of the `Irqs` struct that binds the interrupt ids to their handlers.
+- `embassy-lab-utils` is a helper crate that contains functions and types that act as wrappers over `embassy`'s
+and `embedded-hal` more complex routines.
+- `cyw43-firmware` contains the firmware for the WiFi and BLE chip. It is already loaded by the `init_wifi` function
+from the `embassy-lab-utils` crate.
 
-🙂 Happy face on LED matrix
-Moves forward until obstacle detected
-Performs avoidance maneuvers (backward + turn)
+To better understand how Rust Embedded projects are set up, please read the [debug lab](https://pmrust.pages.upb.ro/docs/acs_cc/lab/01).
 
-Threat Detection (Motion + Obstacle)
-😠 Angry face on LED matrix
-Stops all movement immediately
-Sends Telegram alert: "Threat detected by Security Robot!"
+## How to build and run
 
-Error States
+Make sure you have all prerequisites installed properly, as shown in the [lab tutorial](https://pmrust.pages.upb.ro/docs/acs_cc/tutorials/embassy).
 
-Sensor timeout triggers angry face and alert
-System continues monitoring after errors
+The project can be built for the `thumbv8m.main-none-eabihf` target, by running in the project's root:
 
-Setup Instructions
+```shell
+cargo build
+```
 
-Hardware: Wire components according to pin configuration
-WiFi: Update credentials in main.rs:
-rustwifi_controller.set_credentials("YOUR_SSID", "YOUR_PASSWORD").await;
+This project is set up to automatically run `probe-rs` in order to flash the lab's board, you can simply run in the project's root:
 
-Telegram: Set bot token and chat ID in main.rs:
-rustlet mut telegram_bot = TelegramBot::new("YOUR_BOT_TOKEN", "YOUR_CHAT_ID");
-
-Build: cargo build --release
-Flash: Deploy to Pico W using your preferred method
-
-Code Highlights
-
-Async/Await: Full Embassy async framework usage
-Modular Design: Clean separation of hardware drivers
-Error Handling: Sensor timeouts and recovery
-Smart Logic: Context-aware threat detection
-
-Current Status
-✅ Core functionality implemented
-✅ Hardware drivers complete
-⚠️ Telegram integration needs HTTP client implementation
-⚠️ WiFi error handling could be improved
+```shell
+cargo run
+```
